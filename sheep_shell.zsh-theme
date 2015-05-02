@@ -13,7 +13,8 @@ export LS_COLORS='di=34;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43
 export GREP_COLOR='1;33'
 
 export MODE_INDICATOR="%{$fg[cyan]%}[NORMAL] %{$reset_color%}"
-export RPS1
+export RPS1=""
+export RPROMPT=""
 
 function vi_mode() {
   if {echo $fpath | grep -q "plugins/vi-mode"}; then
