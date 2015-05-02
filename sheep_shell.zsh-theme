@@ -26,10 +26,14 @@ function date_prompt_start()
   echo "`date +%H:%M` `hostname -s` $USER"
 }
 
+function _short_pwd()
+{
+  echo `pwd` | sed -e "s|^$HOME|~|" -e 's-\([^/]\)[^/]*/-\1/-g'
+}
+
 function short_pwd()
 {
-  local _short_pwd=`pwd | sed -e "s|^$HOME|~|" -e 's-\([^/]\)[^/]*/-\1/-g'`
-  echo "%{$fg[blue]%}$_short_pwd%{$reset_color%}"
+  echo "%{$fg[blue]%}$(_short_pwd)%{$reset_color%}"
 }
 
 export ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[green]%}"
