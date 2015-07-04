@@ -1,0 +1,79 @@
+PROMPT_EMOJI="🐑"
+
+export CLICOLOR=1
+export COLORFGBG
+export LSCOLORS="GxFxCxDxBxegedabagaced"
+export LS_COLORS='di=34;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=0;42:ow=0;43:'
+export GREP_COLOR='1;33'
+
+export ZSH_THEME_GIT_PROMPT_PREFIX="%F{green}"
+export ZSH_THEME_GIT_PROMPT_SUFFIX="%F{none}"
+
+export ZSH_THEME_GIT_PROMPT_DIRTY=" %F{red}✗%F{none}"
+export ZSH_THEME_GIT_PROMPT_CLEAN=" %F{green}✔%F{none}"
+export ZSH_THEME_GIT_PROMPT_ADDED="%F{green}✚ "
+export ZSH_THEME_GIT_PROMPT_MODIFIED="%F{yellow}⚑ "
+export ZSH_THEME_GIT_PROMPT_DELETED="%F{red}✖ "
+export ZSH_THEME_GIT_PROMPT_RENAMED="%F{blue}▴ "
+export ZSH_THEME_GIT_PROMPT_UNMERGED="%F{cyan}§ "
+export ZSH_THEME_GIT_PROMPT_UNTRACKED="%F{grey}◒ "
+
+function prompt_sheepshell_precmd
+{
+
+}
+
+function prompt_sheepshell_setup
+{
+  unset LOCAL_OPTIONS
+  prompt_opts=(cr percent subst)
+
+  autoload -Uz add-zsh-hook
+
+  add-zsh-hook precmd prompt_sheepshell_precmd
+
+  PROMPT='
+$(short_pwd) $(fast_git_prompt_info)
+$(date_prompt_start) $PROMPT_EMOJI  '
+
+  RPROMPT=''
+}
+
+function date_prompt_start
+{
+  echo "`date +%H:%M` `hostname -s` $USER"
+}
+
+function _short_pwd
+{
+  echo `pwd` | sed -e "s|^$HOME|~|" -e 's-\([^/]\)[^/]*/-\1/-g'
+}
+
+function short_pwd
+{
+  echo "%F{blue}$(_short_pwd)%F{none}"
+}
+
+function fast_git_prompt_info()
+{
+  if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    local branch=`git symbolic-ref --short HEAD`
+
+    if git diff-index --no-ext-diff --quiet HEAD > /dev/null 2>&1; then
+      echo "[%F{green}$branch$ZSH_THEME_GIT_PROMPT_CLEAN]"
+    else
+      echo "[%F{red}$branch$ZSH_THEME_GIT_PROMPT_DIRTY]"
+    fi
+  fi
+}
+
+function fast_hg_prompt_info()
+{
+  if [ $(in_hg) ]; then
+    local branch=$(hg_get_branch_name)
+
+    hg_dirty_choose "[%F{red}$branch$ZSH_THEME_GIT_PROMPT_DIRTY]" "[%F{green}$branch$ZSH_THEME_GIT_PROMPT_CLEAN]"
+  fi
+}
+
+prompt_sheepshell_setup "$@"
