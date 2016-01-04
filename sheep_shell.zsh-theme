@@ -16,6 +16,13 @@ export MODE_INDICATOR="%{$fg[cyan]%}[NORMAL] %{$reset_color%}"
 export RPS1=""
 export RPROMPT=""
 
+# Use git directly if possible (homebrew), xcrun is too slow.
+if [ -f /usr/local/bin/git ]; then
+  export SHEEP_GIT="/usr/local/bin/git"
+else
+  export SHEEP_GIT="git"
+fi
+
 function vi_mode() {
   if {echo $fpath | grep -q "plugins/vi-mode"}; then
     echo "$(vi_mode_prompt_info)"
@@ -51,10 +58,10 @@ export ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg[grey]%}◒ "
 
 function fast_git_prompt_info()
 {
-  if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-    local branch=`git symbolic-ref --short HEAD`
+  if $SHEEP_GIT rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    local branch=`$SHEEP_GIT symbolic-ref --short HEAD`
 
-    if git diff-index --no-ext-diff --quiet HEAD > /dev/null 2>&1; then
+    if $SHEEP_GIT diff-index --no-ext-diff --quiet HEAD > /dev/null 2>&1; then
       echo "[%{$fg[green]%}$branch$ZSH_THEME_GIT_PROMPT_CLEAN]"
     else
       echo "[%{$fg[red]%}$branch$ZSH_THEME_GIT_PROMPT_DIRTY]"

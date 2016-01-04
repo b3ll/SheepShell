@@ -18,6 +18,13 @@ export ZSH_THEME_GIT_PROMPT_RENAMED="%F{blue}▴ "
 export ZSH_THEME_GIT_PROMPT_UNMERGED="%F{cyan}§ "
 export ZSH_THEME_GIT_PROMPT_UNTRACKED="%F{grey}◒ "
 
+# Use git directly if possible (homebrew), xcrun is too slow.
+if [ -f /usr/local/bin/git ]; then
+  export SHEEP_GIT="/usr/local/bin/git"
+else
+  export SHEEP_GIT="git"
+fi
+
 function prompt_sheepshell_precmd
 {
 
@@ -33,7 +40,7 @@ function prompt_sheepshell_setup
   add-zsh-hook precmd prompt_sheepshell_precmd
 
   PROMPT='
-$(short_pwd) $(fast_git_prompt_info)
+$(short_pwd) $(fast_git_prompt_info)$(fast_hg_prompt_info)
 $(date_prompt_start) $PROMPT_EMOJI  '
 
   RPROMPT=''
@@ -56,10 +63,10 @@ function short_pwd
 
 function fast_git_prompt_info()
 {
-  if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-    local branch=`git symbolic-ref --short HEAD`
+  if $SHEEP_GIT rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    local branch=`$SHEEP_GIT symbolic-ref --short HEAD`
 
-    if git diff-index --no-ext-diff --quiet HEAD > /dev/null 2>&1; then
+    if $SHEEP_GIT diff-index --no-ext-diff --quiet HEAD > /dev/null 2>&1; then
       echo "[%F{green}$branch$ZSH_THEME_GIT_PROMPT_CLEAN]"
     else
       echo "[%F{red}$branch$ZSH_THEME_GIT_PROMPT_DIRTY]"
